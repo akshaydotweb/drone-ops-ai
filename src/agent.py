@@ -12,16 +12,38 @@ load_dotenv()
 class DroneOperationsAgent:
     """Main AI Agent for drone operations coordination."""
     
-    def __init__(self, csv_path: str = "../sample-data"):
-        """Initialize the agent with data from CSV files."""
+    def __init__(self, csv_path: str = "../sample-data", google_sheets_id: str = None, 
+                 pilot_sheet_id: str = None, drone_sheet_id: str = None, mission_sheet_id: str = None):
+        """Initialize the agent with data from CSV files or Google Sheets.
+        
+        Args:
+            csv_path: Path to CSV data files
+            google_sheets_id: Optional single Google Sheets ID for all data
+            pilot_sheet_id: Separate Pilot Roster Google Sheet ID
+            drone_sheet_id: Separate Drone Fleet Google Sheet ID
+            mission_sheet_id: Separate Missions Google Sheet ID
+        """
         self.db = DroneDatabase()
         
-        # Load data
-        self.db.load_from_csv(
-            pilot_csv=f"{csv_path}/pilot_roster.csv",
-            drone_csv=f"{csv_path}/drone_fleet.csv",
-            mission_csv=f"{csv_path}/missions.csv"
-        )
+        # Try to load from separate Google Sheets first (if provided)
+        if pilot_sheet_id and drone_sheet_id and mission_sheet_id:
+            sheets_loaded = self.db.load_from_separate_google_sheets(pilot_sheet_id, drone_sheet_id, mission_sheet_id)
+            if sheets_loaded:
+                print("OK: Agent initialized with separate Google Sheets")
+        # Try single Google Sheet (if provided)
+        elif google_sheets_id:
+            sheets_loaded = self.db.load_from_google_sheets(google_sheets_id)
+            if sheets_loaded:
+                print("OK: Agent initialized with Google Sheets")
+        
+        # If no Google Sheets loaded, or if it failed, fallback to CSV
+        if not self.db.pilots:
+            print("Loading from CSV files...")
+            self.db.load_from_csv(
+                pilot_csv=f"{csv_path}/pilot_roster.csv",
+                drone_csv=f"{csv_path}/drone_fleet.csv",
+                mission_csv=f"{csv_path}/missions.csv"
+            )
         
         self.tools = DroneOperationsTools(self.db)
         self.conversation_history = []
