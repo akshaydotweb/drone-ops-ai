@@ -337,3 +337,65 @@ class DroneOperationsTools:
             result += f"   Status: {pilot.status}\n\n"
         
         return result
+
+    # ===== SYSTEM STATUS TOOLS =====
+    def get_system_status(self) -> str:
+        """Get overall system status and statistics."""
+        # Pilot statistics
+        total_pilots = len(self.db.pilots)
+        available_pilots = len(self.db.get_available_pilots())
+        assigned_pilots = sum(1 for p in self.db.pilots.values() if p.status == "Assigned")
+        unavailable_pilots = total_pilots - available_pilots - assigned_pilots
+        
+        # Drone statistics
+        total_drones = len(self.db.drones)
+        available_drones = len(self.db.get_available_drones())
+        deployed_drones = sum(1 for d in self.db.drones.values() if d.status == "Deployed")
+        maintenance_drones = sum(1 for d in self.db.drones.values() if d.status == "Maintenance")
+        
+        # Mission statistics
+        total_missions = len(self.db.missions)
+        assigned_missions = sum(1 for m in self.db.missions.values() if m.assigned_pilot)
+        unassigned_missions = total_missions - assigned_missions
+        
+        # Conflicts
+        conflicts = self.conflict_detector.detect_all_conflicts()
+        critical_conflicts = len([c for c in conflicts if c.severity == "critical"])
+        major_conflicts = len([c for c in conflicts if c.severity == "major"])
+        minor_conflicts = len([c for c in conflicts if c.severity == "minor"])
+        
+        # Calculate percentages
+        pilots_available_pct = round((available_pilots / total_pilots * 100) if total_pilots > 0 else 0)
+        drones_available_pct = round((available_drones / total_drones * 100) if total_drones > 0 else 0)
+        missions_assigned_pct = round((assigned_missions / total_missions * 100) if total_missions > 0 else 0)
+        
+        result = "\n"
+        result += "SYSTEM STATUS REPORT\n\n"
+        
+        result += "PILOTS\n"
+        result += f"  Total:       {total_pilots}\n"
+        result += f"  Available:   {available_pilots} ({pilots_available_pct}%)\n"
+        result += f"  Assigned:    {assigned_pilots}\n"
+        result += f"  Unavailable: {unavailable_pilots}\n\n"
+        
+        result += "DRONES\n"
+        result += f"  Total:       {total_drones}\n"
+        result += f"  Available:   {available_drones} ({drones_available_pct}%)\n"
+        result += f"  Deployed:    {deployed_drones}\n"
+        result += f"  Maintenance: {maintenance_drones}\n\n"
+        
+        result += "MISSIONS\n"
+        result += f"  Total:       {total_missions}\n"
+        result += f"  Assigned:    {assigned_missions} ({missions_assigned_pct}%)\n"
+        result += f"  Unassigned:  {unassigned_missions}\n\n"
+        
+        result += "CONFLICTS\n"
+        result += f"  Critical:    {critical_conflicts}\n"
+        result += f"  Major:       {major_conflicts}\n"
+        result += f"  Minor:       {minor_conflicts}\n"
+        
+        if critical_conflicts > 0:
+            result += f"\n  WARNING: {critical_conflicts} critical conflict(s) require attention!\n"
+            result += "  Use 'Detect conflicts' for details.\n"
+        
+        return result

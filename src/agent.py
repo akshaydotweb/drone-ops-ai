@@ -271,6 +271,9 @@ Use the available tools to answer the user's question. Be conversational and hel
         elif "conflict" in query_lower or "detect" in query_lower and "conflict" in query_lower:
             return self.tools.detect_conflicts()
         
+        elif "status" in query_lower or "overview" in query_lower:
+            return self.tools.get_system_status()
+        
         elif "alternative" in query_lower or "reassign" in query_lower:
             mission_id = self._extract_mission_id(user_query)
             pilot_id = self._extract_pilot_id(user_query)
@@ -379,6 +382,11 @@ CONFLICT MANAGEMENT:
   • "Detect conflicts" - Check for any scheduling or skill issues
   • "Find conflicts" - Same as above
   • "Check for conflicts" - Same as above
+
+SYSTEM MANAGEMENT:
+  • "Show system status" - View overall system statistics
+  • "System overview" - Same as above
+  • "Status" - Same as above
 
 EXAMPLES:
   • "Show all pilots in Bangalore" - Pilots in Bangalore
