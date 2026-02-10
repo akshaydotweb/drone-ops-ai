@@ -73,8 +73,10 @@ class DroneOperationsAgent:
     def _process_with_llm(self, user_query: str) -> str:
         """Process query using the LLM with tools."""
         try:
-            from langchain.tools import Tool
-            from langchain.agents import tool
+            try:
+                from langchain_core.tools import Tool
+            except ImportError:
+                from langchain.tools import Tool
             
             # Create tool descriptions for the LLM
             tools_list = [
@@ -143,7 +145,7 @@ Use the available tools to answer the user's question. Be conversational and hel
                 return str(response)
         
         except Exception as e:
-            return f"Error processing with LLM: {str(e)}. Falling back to rule-based response..."
+            raise Exception(f"LLM processing failed: {str(e)}")
     
     def _process_rule_based(self, user_query: str) -> str:
         """Process query using rule-based logic (fallback mode)."""
