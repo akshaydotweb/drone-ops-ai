@@ -25,25 +25,45 @@ class DroneOperationsAgent:
         """
         self.db = DroneDatabase()
         
-        # Try to load from separate Google Sheets first (if provided)
+        # Try to read Google Sheets IDs from environment variables if not provided
+        pilot_sheet_id = pilot_sheet_id or os.getenv("GOOGLE_SHEETS_PILOTS_ID")
+        drone_sheet_id = drone_sheet_id or os.getenv("GOOGLE_SHEETS_DRONES_ID")
+        mission_sheet_id = mission_sheet_id or os.getenv("GOOGLE_SHEETS_MISSIONS_ID")
+        google_sheets_id = google_sheets_id or os.getenv("GOOGLE_SHEETS_ID")
+        
+        # Try to load from separate Google Sheets first (if all IDs provided)
         if pilot_sheet_id and drone_sheet_id and mission_sheet_id:
+            print("Attempting to load from separate Google Sheets...")
             sheets_loaded = self.db.load_from_separate_google_sheets(pilot_sheet_id, drone_sheet_id, mission_sheet_id)
             if sheets_loaded:
                 print("OK: Agent initialized with separate Google Sheets")
+                self.tools = DroneOperationsTools(self.db)
+                self.conversation_history = []
+                self.llm = self._initialize_llm()
+                return
+            else:
+                print("FALLING BACK: Could not load from Google Sheets, using CSV...")
+        
         # Try single Google Sheet (if provided)
         elif google_sheets_id:
+            print("Attempting to load from Google Sheets...")
             sheets_loaded = self.db.load_from_google_sheets(google_sheets_id)
             if sheets_loaded:
                 print("OK: Agent initialized with Google Sheets")
+                self.tools = DroneOperationsTools(self.db)
+                self.conversation_history = []
+                self.llm = self._initialize_llm()
+                return
+            else:
+                print("FALLING BACK: Could not load from Google Sheets, using CSV...")
         
-        # If no Google Sheets loaded, or if it failed, fallback to CSV
-        if not self.db.pilots:
-            print("Loading from CSV files...")
-            self.db.load_from_csv(
-                pilot_csv=f"{csv_path}/pilot_roster.csv",
-                drone_csv=f"{csv_path}/drone_fleet.csv",
-                mission_csv=f"{csv_path}/missions.csv"
-            )
+        # Fallback to CSV
+        print("Loading from CSV files...")
+        self.db.load_from_csv(
+            pilot_csv=f"{csv_path}/pilot_roster.csv",
+            drone_csv=f"{csv_path}/drone_fleet.csv",
+            mission_csv=f"{csv_path}/missions.csv"
+        )
         
         self.tools = DroneOperationsTools(self.db)
         self.conversation_history = []

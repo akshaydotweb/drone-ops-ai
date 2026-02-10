@@ -14,29 +14,9 @@ app.config['JSON_SORT_KEYS'] = False
 
 # Initialize agent with optional Google Sheets support
 try:
-    # Try separate Google Sheets first
-    pilot_sheet_id = os.getenv("PILOT_SHEET_ID")
-    drone_sheet_id = os.getenv("DRONE_SHEET_ID")
-    mission_sheet_id = os.getenv("MISSION_SHEET_ID")
-    
-    # Fallback to single sheet or CSV
-    google_sheets_id = os.getenv("GOOGLE_SHEETS_ID")
-    
-    if pilot_sheet_id and drone_sheet_id and mission_sheet_id:
-        print("Loading from separate Google Sheets...")
-        agent = DroneOperationsAgent(
-            csv_path="./sample-data",
-            pilot_sheet_id=pilot_sheet_id,
-            drone_sheet_id=drone_sheet_id,
-            mission_sheet_id=mission_sheet_id
-        )
-    elif google_sheets_id:
-        print("Loading from Google Sheets...")
-        agent = DroneOperationsAgent(csv_path="./sample-data", google_sheets_id=google_sheets_id)
-    else:
-        print("Loading from CSV files...")
-        agent = DroneOperationsAgent(csv_path="./sample-data")
-    
+    # Agent automatically reads Google Sheets IDs from environment variables
+    # Falls back to CSV if no IDs are configured
+    agent = DroneOperationsAgent(csv_path="./sample-data")
     print("OK: Agent initialized successfully!")
 except Exception as e:
     print(f"ERROR: Error initializing agent: {e}")
