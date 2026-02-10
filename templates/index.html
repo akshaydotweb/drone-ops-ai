@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Operations Coordinator - Skylark Spectra</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1a1a1a;
+        }
+        
+        .topbar {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: white;
+            padding: 20px 40px;
+            border-bottom: 2px solid #FF8000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .topbar-brand {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .topbar-status {
+            font-size: 12px;
+            color: #b8d3e8;
+            font-weight: 500;
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            background: #fafafa;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: #f0f4f9;
+            border-right: 1px solid #d1d5db;
+            padding: 30px 20px;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 5;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+        
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #475569;
+            letter-spacing: 0.8px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .sidebar-item {
+            font-size: 14px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-left: 3px solid #FF8000;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 0;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        
+        .sidebar-item:hover {
+            background: #fff5e6;
+            border-color: #FF8000;
+            border-left-color: #E67E00;
+            box-shadow: 0 2px 4px rgba(255, 128, 0, 0.1);
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .header {
+            background: white;
+            color: #1a1a1a;
+            padding: 40px 40px 30px 40px;
+            border-bottom: 3px solid #FF8000;
+            text-align: left;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 800;
+            color: #0a0e27;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        .message {
+            margin-bottom: 0;
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message.assistant {
+            justify-content: flex-start;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 18px 20px;
+            border-radius: 6px;
+            word-wrap: break-word;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        
+        .user .message-content {
+            background: linear-gradient(135deg, #FF8000 0%, #E67E00 100%);
+            color: white;
+            border-radius: 6px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.2);
+        }
+        
+        .assistant .message-content {
+            background: white;
+            color: #1e293b;
+            border-radius: 6px;
+            border: 1.5px solid #e5e5e5;
+            border-left: 5px solid #FF8000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .message.error .message-content {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .loading {
+            display: inline-flex;
+            gap: 4px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 0;
+            background: #FF8000;
+            animation: bounce 1.4s infinite;
+        }
+        
+        .loading-dot:nth-child(1) {
+            animation-delay: 0;
+        }
+        
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            40% {
+                opacity: 1;
+                transform: translateY(-8px);
+            }
+        }
+        
+        .input-container {
+            padding: 20px 40px 40px 40px;
+            border-top: 1px solid #d4e4f0;
+            display: flex;
+            gap: 12px;
+            background: white;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        
+        .input-container input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 0;
+            font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: white;
+            color: #1e293b;
+        }
+        
+        .input-container input:focus {
+            outline: none;
+            border-color: #FF8000;
+            box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.1);
+        }
+        
+        .input-container input::placeholder {
+            color: #6b93b0;
+        }
+        
+        .input-container button {
+            padding: 12px 28px;
+            background: #FF8000;
+            color: white;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-container button:hover {
+            background: #E67E00;
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.3);
+        }
+        
+        .input-container button:active {
+            background: #CC6600;
+        }
+        
+        .help-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #FF8000;
+            color: white;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.4);
+            transition: all 0.3s;
+        }
+        
+        .help-btn:hover {
+            background: #E67E00;
+            box-shadow: 0 6px 16px rgba(255, 128, 0, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 0;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e5e7eb;
+            border-top: 3px solid #FF8000;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 15px;
+            color: #0a0e27;
+            border-bottom: 2px solid #FF8000;
+            padding-bottom: 10px;
+            font-weight: 800;
+        }
+        
+        .modal-content pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 0;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.6;
+            border-left: 3px solid #FF8000;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f3f4f6;
+            border: 1px solid #cbd5e1;
+            width: 30px;
+            height: 30px;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 20px;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: #FF8000;
+            color: white;
+            border-color: #FF8000;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+        
+        /* Visual Hierarchy - Data Components */
+        .data-section {
+            margin-bottom: 8px;
+        }
+        
+        .data-section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0a0e27;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 20px;
+            margin-top: 8px;
+            padding-bottom: 14px;
+            border-bottom: 3px solid #FF8000;
+            display: block;
+        }
+        
+        .items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 14px;
+        }
+        
+        .data-card {
+            background: linear-gradient(to right, #fafafa 0%, white 8%, white 100%);
+            border: 1.5px solid #e5e5e5;
+            border-left: 5px solid #FF8000;
+            padding: 20px 22px;
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        .data-card:hover {
+            background: linear-gradient(to right, #f5f5f5 0%, white 8%, white 100%);
+            border-left-color: #E67E00;
+            box-shadow: 0 6px 16px rgba(255, 128, 0, 0.12);
+            transform: translateX(2px);
+        }
+        
+        .card-header {
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 18px;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #f0f0f0;
+            gap: 12px;
+        }
+        
+        .card-id {
+            font-size: 11px;
+            color: white;
+            background: #FF8000;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-family: 'Monaco', 'Courier New', monospace;
+            letter-spacing: 0.6px;
+            flex-shrink: 0;
+        }
+        
+        .card-field {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 20px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        
+        .card-label {
+            color: #0a0e27;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+        }
+        
+        .card-value {
+            color: #333333;
+            font-weight: 500;
+            line-height: 1.8;
+        }
+        
+        .field-group {
+            margin-top: 16px;
+            margin-bottom: 14px;
+            padding-top: 14px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .field-group-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #0a0e27;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border: 1.5px solid;
+        }
+        
+        .status-available {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #86efac;
+        }
+        
+        .status-unassigned {
+            background: #fffbeb;
+            color: #b45309;
+            border-color: #fcd34d;
+        }
+        
+        .status-assigned {
+            background: #eff6ff;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+        
+        .priority-high {
+            color: #dc2626;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.4px;
+        }
+        
+        .priority-urgent {
+            color: #991b1b;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.4px;
+        }
+        
+        .priority-standard {
+            color: #5b21b6;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.4px;
+        }
+        
+        .count-badge {
+            display: inline-block;
+            background: #0a0e27;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 10px;
+            letter-spacing: 0.3px;
+        }
+        
+        @media (max-width: 1400px) {
+            .sidebar {
+                width: 260px;
+            }
+            
+            .header {
+                padding: 32px 36px;
+            }
+            
+            .chat-container {
+                padding: 24px 36px;
+            }
+            
+            .input-container {
+                padding: 16px 36px 32px 36px;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 240px;
+                padding: 24px 16px;
+            }
+            
+            .topbar {
+                padding: 16px 24px;
+            }
+            
+            .header {
+                padding: 28px 32px;
+            }
+            
+            .chat-container {
+                padding: 20px 32px;
+            }
+            
+            .input-container {
+                padding: 14px 32px 28px 32px;
+            }
+            
+            .card-field {
+                grid-template-columns: 120px 1fr;
+                gap: 16px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .chat-container {
+                padding: 20px 24px;
+            }
+            
+            .message-content {
+                max-width: 80%;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .sidebar-title {
+                display: none;
+            }
+            
+            .sidebar-item {
+                display: none;
+            }
+            
+            .card-field {
+                grid-template-columns: 110px 1fr;
+                gap: 14px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .sidebar-section {
+                display: none;
+            }
+            
+            .sidebar-title {
+                display: none;
+            }
+            
+            .sidebar-item {
+                display: none;
+            }
+            
+            .header {
+                padding: 24px 20px 16px 20px;
+                border-bottom: 2px solid #FF8000;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .header p {
+                font-size: 13px;
+            }
+            
+            .chat-container {
+                padding: 16px 18px;
+                gap: 12px;
+                background: #fafafa;
+            }
+            
+            .message-content {
+                max-width: 90%;
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+            
+            .input-container {
+                padding: 12px 18px 20px 18px;
+                gap: 8px;
+            }
+            
+            .input-container input {
+                font-size: 16px;
+                padding: 11px 14px;
+            }
+            
+            .input-container button {
+                padding: 11px 24px;
+                font-size: 12px;
+            }
+            
+            .card-field {
+                grid-template-columns: 100px 1fr;
+                gap: 12px;
+                font-size: 13px;
+            }
+            
+            .card-header {
+                font-size: 16px;
+                margin-bottom: 14px;
+                gap: 8px;
+            }
+            
+            .data-card {
+                padding: 16px 18px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .topbar {
+                padding: 12px 16px;
+                flex-direction: row;
+                gap: 8px;
+                align-items: center;
+                justify-content: space-between;
+            }
+            
+            .topbar-brand {
+                font-size: 14px;
+                font-weight: 800;
+                letter-spacing: 0.5px;
+            }
+            
+            .topbar-status {
+                font-size: 11px;
+                color: #94a3b8;
+            }
+            
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                display: none;
+            }
+            
+            .sidebar-section {
+                display: none;
+            }
+            
+            .sidebar-title {
+                display: none;
+            }
+            
+            .sidebar-item {
+                display: none;
+            }
+            
+            .header {
+                padding: 16px 14px 12px 14px;
+                text-align: left;
+                border-bottom: 2px solid #FF8000;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+                margin-bottom: 4px;
+                font-weight: 800;
+            }
+            
+            .header p {
+                font-size: 11px;
+                color: #64748b;
+                font-weight: 500;
+            }
+            
+            .chat-container {
+                padding: 12px 14px;
+                gap: 10px;
+                background: #fafafa;
+            }
+            
+            .message {
+                margin-bottom: 0;
+            }
+            
+            .message-content {
+                max-width: 95%;
+                padding: 10px 12px;
+                font-size: 12px;
+                line-height: 1.5;
+            }
+            
+            .user .message-content {
+                background: #FF8000;
+                color: white;
+            }
+            
+            .assistant .message-content {
+                background: white;
+                border: 1px solid #cbd5e1;
+                border-left: 3px solid #FF8000;
+                color: #1e293b;
+            }
+            
+            .message.error .message-content {
+                background: #fee2e2;
+                color: #7f1d1d;
+                border: 1px solid #fecaca;
+            }
+            
+            .input-container {
+                padding: 10px 14px 16px 14px;
+                gap: 6px;
+                flex-direction: row;
+                border-top: 1px solid #e5e7eb;
+                background: white;
+                position: sticky;
+                bottom: 0;
+                z-index: 10;
+            }
+            
+            .input-container input {
+                padding: 10px 12px;
+                font-size: 14px;
+                border: 1px solid #cbd5e1;
+                flex: 1;
+            }
+            
+            .input-container button {
+                padding: 10px 18px;
+                font-size: 11px;
+                font-weight: 700;
+                white-space: nowrap;
+            }
+            
+            .help-btn {
+                bottom: 70px;
+                right: 14px;
+                width: 44px;
+                height: 44px;
+                font-size: 22px;
+            }
+            
+            .modal {
+                padding: 16px;
+            }
+            
+            .modal-content {
+                max-width: 95vw;
+                max-height: 70vh;
+                padding: 20px;
+                border-top: 3px solid #FF8000;
+            }
+            
+            .modal-content h2 {
+                font-size: 16px;
+                margin-bottom: 12px;
+                border-bottom: 2px solid #FF8000;
+                padding-bottom: 8px;
+            }
+            
+            .modal-content pre {
+                font-size: 11px;
+                padding: 12px;
+                border-left: 3px solid #FF8000;
+            }
+            
+            .modal-close {
+                width: 28px;
+                height: 28px;
+                font-size: 18px;
+                top: 14px;
+                right: 14px;
+            }
+            
+            .card-field {
+                grid-template-columns: 90px 1fr;
+                gap: 10px;
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+            
+            .card-label {
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0.4px;
+            }
+            
+            .card-value {
+                font-size: 12px;
+                font-weight: 500;
+            }
+            
+            .card-header {
+                font-size: 15px;
+                margin-bottom: 12px;
+                gap: 6px;
+                padding-bottom: 10px;
+            }
+            
+            .card-id {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            
+            .data-card {
+                padding: 12px 14px;
+                border-left: 4px solid #FF8000;
+                margin-bottom: 10px;
+            }
+            
+            .status-badge {
+                padding: 5px 10px;
+                font-size: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 10px 12px;
+            }
+            
+            .topbar-brand {
+                font-size: 12px;
+            }
+            
+            .topbar-status {
+                font-size: 10px;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .sidebar-section {
+                display: none;
+            }
+            
+            .sidebar-item {
+                display: none;
+            }
+            
+            .header {
+                padding: 12px 12px 10px 12px;
+            }
+            
+            .header h1 {
+                font-size: 16px;
+                margin-bottom: 3px;
+            }
+            
+            .header p {
+                font-size: 10px;
+            }
+            
+            .chat-container {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            
+            .message-content {
+                max-width: 100%;
+                padding: 9px 11px;
+                font-size: 11px;
+            }
+            
+            .input-container {
+                padding: 8px 12px 12px 12px;
+                gap: 4px;
+            }
+            
+            .input-container input {
+                padding: 9px 10px;
+                font-size: 13px;
+            }
+            
+            .input-container button {
+                padding: 9px 14px;
+                font-size: 10px;
+            }
+            
+            .help-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                bottom: 65px;
+                right: 12px;
+            }
+            
+            .sidebar {
+                padding: 10px 12px;
+                gap: 10px;
+                display: none;
+            }
+            
+            .sidebar-section {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .topbar {
+                padding: 8px 10px;
+            }
+            
+            .topbar-brand {
+                font-size: 11px;
+                letter-spacing: 0px;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .sidebar-section {
+                display: none;
+            }
+            
+            .header h1 {
+                font-size: 14px;
+            }
+            
+            .message-content {
+                padding: 8px 10px;
+                font-size: 10px;
+            }
+            
+            .input-container input {
+                font-size: 12px;
+            }
+            
+            .sidebar-item {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-brand">Drone Operations Coordinator</div>
+        <div class="topbar-status"><span class="status-indicator"></span>AI Powered</div>
+    </div>
+    
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Quick Commands</div>
+                <div class="sidebar-item" onclick="queryPilots()">View Pilots</div>
+                <div class="sidebar-item" onclick="queryDrones()">View Drones</div>
+                <div class="sidebar-item" onclick="queryMissions()">View Missions</div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Operations</div>
+                <div class="sidebar-item" onclick="showStatus()">System Status</div>
+                <div class="sidebar-item" onclick="detectConflicts()">Find Conflicts</div>
+                <div class="sidebar-item" onclick="showHelp()">Help & Docs</div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="header">
+                <h1>Drone Operations Coordinator</h1>
+                <p>AI-Powered Assignment & Conflict Management</p>
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                <div class="message assistant">
+                    <div class="message-content">
+                        Welcome! I'm your Drone Operations Coordinator AI. I can help you with:
+                        <br><br>
+                        • Finding available pilots and drones
+                        <br>• Viewing missions and projects
+                        <br>• Making smart assignments
+                        <br>• Detecting scheduling conflicts
+                        <br>• Coordinating urgent reassignments
+                        <br><br>
+                        Try asking: "Show available pilots in Bangalore" or "What missions need assignment?"
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type your question or command..." />
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <button class="help-btn" onclick="showHelp()">?</button>
+    
+    <div class="modal" id="helpModal">
+        <div style="position: relative; width: 100%; max-width: 500px;">
+            <button class="modal-close" onclick="closeHelp()">×</button>
+            <div class="modal-content">
+                <h2>Quick Commands</h2>
+                <pre id="helpText"></pre>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const helpModal = document.getElementById('helpModal');
+        const helpText = document.getElementById('helpText');
+        
+        // Load help text on startup
+        fetch('/api/help')
+            .then(r => r.json())
+            .then(data => {
+                helpText.textContent = data.help;
+            })
+            .catch(err => console.error('Error loading help:', err));
+        
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat(message, 'user');
+            messageInput.value = '';
+            
+            // Show loading indicator
+            addLoadingIndicator();
+            
+            // Send to backend
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message })
+            })
+            .then(r => r.json())
+            .then(data => {
+                removeLoadingIndicator();
+                if (data.success) {
+                    addMessageToChat(data.message, 'assistant');
+                } else {
+                    addMessageToChat('Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            })
+            .catch(err => {
+                removeLoadingIndicator();
+                addMessageToChat('Error: Failed to get response', 'error');
+                console.error('Error:', err);
+            });
+        }
+        
+        function addMessageToChat(content, role) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            // For assistant messages, parse and render as components
+            if (role === 'assistant') {
+                const html = parseResponseToHTML(content);
+                contentDiv.innerHTML = html;
+            } else {
+                contentDiv.textContent = content;
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            
+            // Smooth scroll to bottom
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 0);
+        }
+        
+        function parseResponseToHTML(content) {
+            // Detect response type and format accordingly
+            if (content.includes('Available Pilots')) {
+                return formatPilotsList(content);
+            } else if (content.includes('Available Drones')) {
+                return formatDronesList(content);
+            } else if (content.includes('All Missions')) {
+                return formatMissionsList(content);
+            } else if (content.includes('Mission Details')) {
+                return formatMissionDetails(content);
+            } else if (content.includes('Recommended Pilot')) {
+                return formatRecommendedPilot(content);
+            } else if (content.includes('Recommended Drone')) {
+                return formatRecommendedDrone(content);
+            } else if (content.includes('Conflicts')) {
+                return formatConflictsList(content);
+            } else if (content.includes('ERROR')) {
+                return `<span style="color: #dc2626; font-weight: 600;">${escapeHtml(content)}</span>`;
+            } else {
+                return escapeHtml(content).replace(/\\n/g, '<br>');
+            }
+        }
+        
+        function formatPilotsList(content) {
+            const lines = content.split('\n').filter(l => l.trim());
+            let html = '<div class="data-section"><div class="data-section-title">Available Pilots</div><div class="items-container">';
+            
+            let itemLines = [];
+            let inItem = false;
+            
+            for (const line of lines) {
+                if (/^\d+\./.test(line.trim())) {
+                    if (itemLines.length > 0) {
+                        html += formatPilotCard(itemLines);
+                        itemLines = [];
+                    }
+                    itemLines.push(line);
+                    inItem = true;
+                } else if (inItem && line.trim()) {
+                    itemLines.push(line);
+                }
+            }
+            if (itemLines.length > 0) {
+                html += formatPilotCard(itemLines);
+            }
+            
+            html += '</div></div>';
+            return html;
+        }
+        
+        function formatPilotCard(lines) {
+            const name = lines[0].replace(/^\d+\.\s+/, '').trim();
+            const data = {};
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                const parts = line.split(':');
+                if (parts.length === 2) {
+                    const key = parts[0].trim();
+                    const value = parts[1].trim();
+                    if (key && value) data[key] = value;
+                }
+            }
+            
+            const nameId = name.match(/\(([^)]+)\)/);
+            const pilotName = name.replace(/\s*\([^)]+\)/, '');
+            const pilotId = nameId ? nameId[1] : '';
+            
+            return `
+                <div class="data-card">
+                    <div class="card-header">
+                        <span>${pilotName}</span>
+                        <span class="card-id">${pilotId}</span>
+                    </div>
+                    <div class="card-field"><span class="card-label">Skills</span><span class="card-value">${data.Skills || 'N/A'}</span></div>
+                    <div class="card-field"><span class="card-label">Certifications</span><span class="card-value">${data.Certifications || 'N/A'}</span></div>
+                    <div class="card-field"><span class="card-label">Location</span><span class="card-value">${data.Location || 'N/A'}</span></div>
+                    <div class="field-group">
+                        <div class="field-group-title">Status</div>
+                        <div class="card-field" style="margin-bottom: 0;"><span class="status-badge status-available">${data.Status || 'Available'}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function formatDronesList(content) {
+            const lines = content.split('\n').filter(l => l.trim());
+            let html = '<div class="data-section"><div class="data-section-title">Available Drones</div><div class="items-container">';
+            
+            let itemLines = [];
+            let inItem = false;
+            
+            for (const line of lines) {
+                if (/^\d+\./.test(line.trim())) {
+                    if (itemLines.length > 0) {
+                        html += formatDroneCard(itemLines);
+                        itemLines = [];
+                    }
+                    itemLines.push(line);
+                    inItem = true;
+                } else if (inItem && line.trim()) {
+                    itemLines.push(line);
+                }
+            }
+            if (itemLines.length > 0) {
+                html += formatDroneCard(itemLines);
+            }
+            
+            html += '</div></div>';
+            return html;
+        }
+        
+        function formatDroneCard(lines) {
+            const name = lines[0].replace(/^\d+\.\s+/, '').trim();
+            const data = {};
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                const parts = line.split(':');
+                if (parts.length === 2) {
+                    const key = parts[0].trim();
+                    const value = parts[1].trim();
+                    if (key && value) data[key] = value;
+                }
+            }
+            
+            const nameId = name.match(/\(([^)]+)\)/);
+            const droneName = name.replace(/\s*\([^)]+\)/, '');
+            const droneId = nameId ? nameId[1] : '';
+            
+            return `
+                <div class="data-card">
+                    <div class="card-header">
+                        <span>${droneName}</span>
+                        <span class="card-id">${droneId}</span>
+                    </div>
+                    <div class="card-field"><span class="card-label">Capabilities</span><span class="card-value">${data.Capabilities || 'N/A'}</span></div>
+                    <div class="card-field"><span class="card-label">Location</span><span class="card-value">${data.Location || 'N/A'}</span></div>
+                    <div class="field-group">
+                        <div class="field-group-title">Status</div>
+                        <div class="card-field" style="margin-bottom: 0;"><span class="status-badge status-available">${data.Status || 'Available'}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function formatMissionsList(content) {
+            const lines = content.split('\n').filter(l => l.trim());
+            let html = '<div class="data-section"><div class="data-section-title">Missions</div><div class="items-container">';
+            
+            let itemLines = [];
+            let inItem = false;
+            
+            for (const line of lines) {
+                if (/^\d+\./.test(line.trim())) {
+                    if (itemLines.length > 0) {
+                        html += formatMissionCard(itemLines);
+                        itemLines = [];
+                    }
+                    itemLines.push(line);
+                    inItem = true;
+                } else if (inItem && line.trim()) {
+                    itemLines.push(line);
+                }
+            }
+            if (itemLines.length > 0) {
+                html += formatMissionCard(itemLines);
+            }
+            
+            html += '</div></div>';
+            return html;
+        }
+        
+        function formatMissionCard(lines) {
+            const missionId = lines[0].replace(/^\d+\.\s+/, '').trim();
+            const data = {};
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                const parts = line.split(':');
+                if (parts.length === 2) {
+                    const key = parts[0].trim();
+                    const value = parts[1].trim();
+                    if (key && value) data[key] = value;
+                }
+            }
+            
+            const statusClass = data.Status === 'Assigned' ? 'status-assigned' : 'status-unassigned';
+            const priorityClass = data.Priority ? `priority-${data.Priority.toLowerCase()}` : '';
+            
+            return `
+                <div class="data-card">
+                    <div class="card-header">
+                        <span>${missionId}</span>
+                        <span class="card-id">${data.Client || 'N/A'}</span>
+                    </div>
+                    <div class="card-field"><span class="card-label">Location</span><span class="card-value">${data.Location || 'N/A'}</span></div>
+                    <div class="card-field"><span class="card-label">Priority</span><span class="card-value"><span class="${priorityClass}">${data.Priority || 'N/A'}</span></span></div>
+                    <div class="field-group">
+                        <div class="field-group-title">Assignment Status</div>
+                        <div class="card-field" style="margin-bottom: 0;"><span class="status-badge ${statusClass}">${data.Status || 'Unassigned'}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function formatMissionDetails(content) {
+            return `<pre style="background: #ffffff; padding: 16px; border-radius: 6px; font-size: 13px; color: #333; border-left: 5px solid #FF8000; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; line-height: 1.6; margin: 0;">${escapeHtml(content)}</pre>`;
+        }
+        
+        function formatRecommendedPilot(content) {
+            return `<div class="data-card" style="margin: 0;"><pre style="background: none; padding: 0; border: none; color: #333; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word; font-size: 13px; margin: 0; line-height: 1.6;">${escapeHtml(content)}</pre></div>`;
+        }
+        
+        function formatRecommendedDrone(content) {
+            return `<div class="data-card" style="margin: 0;"><pre style="background: none; padding: 0; border: none; color: #333; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word; font-size: 13px; margin: 0; line-height: 1.6;">${escapeHtml(content)}</pre></div>`;
+        }
+        
+        function formatConflictsList(content) {
+            let html = escapeHtml(content).replace(/CRITICAL/g, '<span style="color: #dc2626; font-weight: 800;">CRITICAL</span>')
+                                          .replace(/MAJOR/g, '<span style="color: #f97316; font-weight: 800;">MAJOR</span>')
+                                          .replace(/MINOR/g, '<span style="color: #eab308; font-weight: 800;">MINOR</span>');
+            return `<pre style="background: #fffbeb; padding: 16px; border-radius: 6px; font-size: 13px; color: #92400e; border-left: 5px solid #FF8000; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; line-height: 1.6; margin: 0;">${html}</pre>`;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function addLoadingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            messageDiv.id = 'loadingIndicator';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'loading-dot';
+                loadingDiv.appendChild(dot);
+            }
+            
+            contentDiv.appendChild(loadingDiv);
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            
+            // Smooth scroll to bottom
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 0);
+        }
+        
+        function removeLoadingIndicator() {
+            const indicator = document.getElementById('loadingIndicator');
+            if (indicator) indicator.remove();
+        }
+        
+        function showHelp() {
+            helpModal.classList.add('active');
+        }
+        
+        function closeHelp() {
+            helpModal.classList.remove('active');
+        }
+        
+        function showStatus() {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(data => {
+                    addMessageToChat(data.summary, 'assistant');
+                })
+                .catch(err => {
+                    addMessageToChat('Error loading status', 'error');
+                });
+        }
+        
+        function queryPilots() {
+            sendCommandMessage('Show available pilots');
+        }
+        
+        function queryDrones() {
+            sendCommandMessage('Show available drones');
+        }
+        
+        function queryMissions() {
+            sendCommandMessage('Show all missions');
+        }
+        
+        function detectConflicts() {
+            sendCommandMessage('Detect scheduling conflicts');
+        }
+        
+        function sendCommandMessage(command) {
+            addMessageToChat(command, 'user');
+            messageInput.value = '';
+            addLoadingIndicator();
+            
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: command })
+            })
+            .then(r => r.json())
+            .then(data => {
+                removeLoadingIndicator();
+                if (data.success) {
+                    addMessageToChat(data.message, 'assistant');
+                } else {
+                    addMessageToChat('Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            })
+            .catch(err => {
+                removeLoadingIndicator();
+                addMessageToChat('Error: Failed to get response', 'error');
+                console.error('Error:', err);
+            });
+        }
+        
+        // Allow Enter key to send messages
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === helpModal) {
+                closeHelp();
+            }
+        });
+    </script>
+</body>
+</html>
