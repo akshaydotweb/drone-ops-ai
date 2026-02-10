@@ -109,9 +109,10 @@
         .header {
             background: white;
             color: #1a1a1a;
-            padding: 40px 40px 30px 40px;
-            border-bottom: 3px solid #FF8000;
+            padding: 0;
+            border-bottom: none;
             text-align: left;
+            display: none;
         }
         
         .header h1 {
@@ -166,7 +167,7 @@
         .message-content {
             max-width: 70%;
             padding: 18px 20px;
-            border-radius: 6px;
+            border-radius: 0;
             word-wrap: break-word;
             line-height: 1.7;
             font-size: 14px;
@@ -175,7 +176,7 @@
         .user .message-content {
             background: linear-gradient(135deg, #FF8000 0%, #E67E00 100%);
             color: white;
-            border-radius: 6px;
+            border-radius: 0;
             border: none;
             box-shadow: 0 4px 12px rgba(255, 128, 0, 0.2);
         }
@@ -183,7 +184,7 @@
         .assistant .message-content {
             background: white;
             color: #1e293b;
-            border-radius: 6px;
+            border-radius: 0;
             border: 1.5px solid #e5e5e5;
             border-left: 5px solid #FF8000;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -406,16 +407,17 @@
         }
         
         .data-section-title {
-            font-size: 15px;
+            font-size: 22px;
             font-weight: 800;
             color: #0a0e27;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
-            margin-bottom: 20px;
-            margin-top: 8px;
-            padding-bottom: 14px;
+            letter-spacing: 1.3px;
+            margin-bottom: 24px;
+            margin-top: 12px;
+            padding-bottom: 16px;
             border-bottom: 3px solid #FF8000;
             display: block;
+            word-spacing: 2px;
         }
         
         .items-container {
@@ -426,97 +428,96 @@
         }
         
         .data-card {
-            background: linear-gradient(to right, #fafafa 0%, white 8%, white 100%);
-            border: 1.5px solid #e5e5e5;
-            border-left: 5px solid #FF8000;
-            padding: 20px 22px;
-            border-radius: 6px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-left: 3px solid #FF8000;
+            padding: 14px 16px;
+            border-radius: 0;
+            transition: all 0.25s ease;
         }
         
         .data-card:hover {
-            background: linear-gradient(to right, #f5f5f5 0%, white 8%, white 100%);
+            background: #fafafa;
             border-left-color: #E67E00;
-            box-shadow: 0 6px 16px rgba(255, 128, 0, 0.12);
-            transform: translateX(2px);
+            border-color: #94a3b8;
         }
         
         .card-header {
             font-weight: 800;
-            color: #1a1a1a;
-            margin-bottom: 18px;
-            font-size: 18px;
+            color: #0a0e27;
+            margin-bottom: 12px;
+            font-size: 14px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            padding-bottom: 14px;
-            border-bottom: 2px solid #f0f0f0;
-            gap: 12px;
+            gap: 8px;
+            letter-spacing: 0.2px;
         }
         
         .card-id {
-            font-size: 11px;
+            font-size: 9px;
             color: white;
             background: #FF8000;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 0;
+            font-weight: 800;
             font-family: 'Monaco', 'Courier New', monospace;
             letter-spacing: 0.6px;
             flex-shrink: 0;
+            text-transform: uppercase;
         }
         
         .card-field {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            gap: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 20px;
             align-items: flex-start;
-            margin-bottom: 12px;
-            font-size: 14px;
-            line-height: 1.7;
+            margin-bottom: 8px;
+            line-height: 1.5;
         }
         
         .card-label {
-            color: #0a0e27;
+            color: #64748b;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 11px;
+            font-size: 9px;
             letter-spacing: 0.6px;
         }
         
         .card-value {
-            color: #333333;
+            color: #1e293b;
             font-weight: 500;
-            line-height: 1.8;
+            font-size: 13px;
+            line-height: 1.5;
         }
         
         .field-group {
-            margin-top: 16px;
-            margin-bottom: 14px;
-            padding-top: 14px;
-            border-top: 2px solid #f0f0f0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+            width: 100%;
         }
         
         .field-group-title {
-            font-size: 11px;
-            font-weight: 800;
-            color: #0a0e27;
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.6px;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
             display: block;
         }
         
         .status-badge {
             display: inline-block;
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 0;
+            font-size: 9px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            border: 1.5px solid;
+            letter-spacing: 0.5px;
+            border: 1px solid;
         }
         
         .status-available {
@@ -566,7 +567,7 @@
             background: #0a0e27;
             color: white;
             padding: 4px 12px;
-            border-radius: 12px;
+            border-radius: 0;
             font-size: 12px;
             font-weight: 700;
             margin-left: 10px;
@@ -613,9 +614,29 @@
                 padding: 14px 32px 28px 32px;
             }
             
+            .data-section-title {
+                font-size: 18px;
+                letter-spacing: 1.1px;
+                margin-bottom: 18px;
+                padding-bottom: 12px;
+            }
+            
+            .card-header {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+            
+            .card-value {
+                font-size: 12px;
+            }
+            
+            .data-card {
+                padding: 12px 14px;
+            }
+            
             .card-field {
-                grid-template-columns: 120px 1fr;
-                gap: 16px;
+                gap: 14px 18px;
+                margin-bottom: 6px;
             }
         }
         
@@ -650,9 +671,29 @@
                 display: none;
             }
             
+            .data-section-title {
+                font-size: 16px;
+                margin-bottom: 16px;
+                padding-bottom: 10px;
+                letter-spacing: 1px;
+            }
+            
+            .card-header {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .card-value {
+                font-size: 12px;
+            }
+            
+            .data-card {
+                padding: 12px 14px;
+            }
+            
             .card-field {
-                grid-template-columns: 110px 1fr;
-                gap: 14px;
+                gap: 12px 16px;
+                margin-bottom: 5px;
             }
         }
         
@@ -688,6 +729,27 @@
             
             .header p {
                 font-size: 13px;
+            }
+            
+            .data-section-title {
+                font-size: 18px;
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+                letter-spacing: 1.1px;
+            }
+            
+            .card-header {
+                font-size: 16px;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+            
+            .card-value {
+                font-size: 13px;
+            }
+            
+            .data-card {
+                padding: 18px 20px;
             }
             
             .chat-container {
@@ -756,6 +818,31 @@
             .topbar-status {
                 font-size: 11px;
                 color: #94a3b8;
+            }
+            
+            .data-section-title {
+                font-size: 16px;
+                margin-bottom: 18px;
+                padding-bottom: 10px;
+                letter-spacing: 1px;
+            }
+            
+            .card-header {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .card-value {
+                font-size: 11px;
+            }
+            
+            .data-card {
+                padding: 10px 12px;
+            }
+            
+            .card-field {
+                gap: 10px 14px;
+                margin-bottom: 4px;
             }
             
             .main-container {
@@ -899,44 +986,88 @@
             }
             
             .card-field {
-                grid-template-columns: 90px 1fr;
-                gap: 10px;
-                font-size: 12px;
-                margin-bottom: 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px 14px;
+                margin-bottom: 4px;
             }
             
             .card-label {
-                font-size: 10px;
+                font-size: 9px;
                 font-weight: 700;
-                letter-spacing: 0.4px;
+                letter-spacing: 0.6px;
+                color: #64748b;
             }
             
             .card-value {
-                font-size: 12px;
+                font-size: 11px;
                 font-weight: 500;
+                color: #1e293b;
             }
             
             .card-header {
-                font-size: 15px;
-                margin-bottom: 12px;
+                font-size: 12px;
+                margin-bottom: 8px;
                 gap: 6px;
-                padding-bottom: 10px;
             }
             
             .card-id {
-                font-size: 10px;
-                padding: 4px 10px;
+                font-size: 9px;
+                padding: 3px 8px;
             }
             
             .data-card {
-                padding: 12px 14px;
-                border-left: 4px solid #FF8000;
+                padding: 10px 12px;
+                border-left: 3px solid #FF8000;
                 margin-bottom: 10px;
             }
             
             .status-badge {
                 padding: 5px 10px;
                 font-size: 10px;
+            }
+            
+            .stats-container {
+                display: grid;
+                gap: 15px;
+            }
+            
+            .status-category {
+                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                border-left: 4px solid #FF8000;
+                padding: 14px 16px;
+                border-radius: 0;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            }
+            
+            .status-category-title {
+                font-size: 13px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.6px;
+                color: #1a1a1a;
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            
+            .status-item {
+                display: grid;
+                grid-template-columns: 140px 1fr;
+                gap: 16px;
+                font-size: 13px;
+                margin-bottom: 8px;
+                align-items: center;
+            }
+            
+            .status-label {
+                font-weight: 600;
+                color: #64748b;
+            }
+            
+            .status-value {
+                font-weight: 700;
+                color: #0f172a;
             }
         }
         
@@ -951,6 +1082,42 @@
             
             .topbar-status {
                 font-size: 10px;
+            }
+            
+            .data-section-title {
+                font-size: 12px;
+                margin-bottom: 12px;
+                padding-bottom: 6px;
+                letter-spacing: 0.5px;
+            }
+            
+            .card-header {
+                font-size: 11px;
+                margin-bottom: 6px;
+                gap: 4px;
+            }
+            
+            .card-id {
+                font-size: 8px;
+                padding: 2px 6px;
+            }
+            
+            .card-value {
+                font-size: 10px;
+            }
+            
+            .data-card {
+                padding: 9px 11px;
+            }
+            
+            .card-field {
+                gap: 8px 12px;
+                margin-bottom: 3px;
+            }
+            
+            .card-label {
+                font-size: 8px;
+                letter-spacing: 0.4px;
             }
             
             .sidebar {
@@ -1045,6 +1212,42 @@
                 font-size: 14px;
             }
             
+            .data-section-title {
+                font-size: 11px;
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+                letter-spacing: 0.4px;
+            }
+            
+            .card-header {
+                font-size: 10px;
+                margin-bottom: 5px;
+                gap: 3px;
+            }
+            
+            .card-id {
+                font-size: 8px;
+                padding: 2px 6px;
+            }
+            
+            .card-value {
+                font-size: 9px;
+            }
+            
+            .data-card {
+                padding: 8px 10px;
+            }
+            
+            .card-field {
+                gap: 6px 10px;
+                margin-bottom: 2px;
+            }
+            
+            .card-label {
+                font-size: 7px;
+                letter-spacing: 0.3px;
+            }
+            
             .message-content {
                 padding: 8px 10px;
                 font-size: 10px;
@@ -1084,11 +1287,6 @@
         </div>
         
         <div class="container">
-            <div class="header">
-                <h1>Drone Operations Coordinator</h1>
-                <p>AI-Powered Assignment & Conflict Management</p>
-            </div>
-            
             <div class="chat-container" id="chatContainer">
                 <div class="message assistant">
                     <div class="message-content">
@@ -1129,6 +1327,22 @@
         const messageInput = document.getElementById('messageInput');
         const helpModal = document.getElementById('helpModal');
         const helpText = document.getElementById('helpText');
+        
+        // Auto-scroll function
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Watch for new messages and scroll automatically
+        const observer = new MutationObserver(() => {
+            scrollToBottom();
+        });
+        
+        observer.observe(chatContainer, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
         
         // Load help text on startup
         fetch('/api/help')
@@ -1191,10 +1405,8 @@
             messageDiv.appendChild(contentDiv);
             chatContainer.appendChild(messageDiv);
             
-            // Smooth scroll to bottom
-            setTimeout(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 0);
+            // Scroll to bottom immediately
+            scrollToBottom();
         }
         
         function parseResponseToHTML(content) {
@@ -1211,7 +1423,9 @@
                 return formatRecommendedPilot(content);
             } else if (content.includes('Recommended Drone')) {
                 return formatRecommendedDrone(content);
-            } else if (content.includes('Conflicts')) {
+            } else if (content.includes('Current Drone Operations Summary') || content.includes('Drone Operations Summary')) {
+                return formatStatus(content);
+            } else if (content.includes('Conflicts') || content.includes('CRITICAL') || content.includes('MAJOR') || content.includes('MINOR')) {
                 return formatConflictsList(content);
             } else if (content.includes('ERROR')) {
                 return `<span style="color: #dc2626; font-weight: 600;">${escapeHtml(content)}</span>`;
@@ -1404,7 +1618,7 @@
         }
         
         function formatMissionDetails(content) {
-            return `<pre style="background: #ffffff; padding: 16px; border-radius: 6px; font-size: 13px; color: #333; border-left: 5px solid #FF8000; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; line-height: 1.6; margin: 0;">${escapeHtml(content)}</pre>`;
+            return `<pre style="background: #ffffff; padding: 16px; border-radius: 0; font-size: 13px; color: #333; border-left: 5px solid #FF8000; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; line-height: 1.6; margin: 0;">${escapeHtml(content)}</pre>`;
         }
         
         function formatRecommendedPilot(content) {
@@ -1415,11 +1629,37 @@
             return `<div class="data-card" style="margin: 0;"><pre style="background: none; padding: 0; border: none; color: #333; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word; font-size: 13px; margin: 0; line-height: 1.6;">${escapeHtml(content)}</pre></div>`;
         }
         
+        function formatStatus(content) {
+            const lines = content.split('\n').filter(l => l.trim());
+            let html = '<div class="data-section"><div class="data-section-title">Operations Summary</div><div class="stats-container">';
+            
+            // Parse status lines
+            let currentSection = '';
+            for (const line of lines) {
+                if (line.includes('Pilots:') || line.includes('Drones:') || line.includes('Missions:')) {
+                    if (currentSection) html += '</div>';
+                    const title = line.split(':')[0].trim();
+                    html += `<div class="status-category"><div class="status-category-title">${title}</div>`;
+                    currentSection = title;
+                } else if (line.includes('-') && currentSection) {
+                    const parts = line.split('-');
+                    if (parts.length === 2) {
+                        const label = parts[0].replace(/^\s*[-•]\s*/, '').trim();
+                        const value = parts[1].trim();
+                        html += `<div class="status-item"><span class="status-label">${label}</span><span class="status-value">${value}</span></div>`;
+                    }
+                }
+            }
+            if (currentSection) html += '</div>';
+            html += '</div></div>';
+            return html;
+        }
+        
         function formatConflictsList(content) {
             let html = escapeHtml(content).replace(/CRITICAL/g, '<span style="color: #dc2626; font-weight: 800;">CRITICAL</span>')
                                           .replace(/MAJOR/g, '<span style="color: #f97316; font-weight: 800;">MAJOR</span>')
                                           .replace(/MINOR/g, '<span style="color: #eab308; font-weight: 800;">MINOR</span>');
-            return `<pre style="background: #fffbeb; padding: 16px; border-radius: 6px; font-size: 13px; color: #92400e; border-left: 5px solid #FF8000; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; line-height: 1.6; margin: 0;">${html}</pre>`;
+            return `<div class="data-section"><div class="data-section-title">Conflict Detection</div><pre style="background: #fffbeb; padding: 16px; border-radius: 0; font-size: 13px; color: #92400e; border-left: 5px solid #FF8000; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; line-height: 1.6; margin: 0;">${html}</pre></div>`;
         }
         
         function escapeHtml(text) {
@@ -1449,10 +1689,8 @@
             messageDiv.appendChild(contentDiv);
             chatContainer.appendChild(messageDiv);
             
-            // Smooth scroll to bottom
-            setTimeout(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 0);
+            // Scroll to bottom immediately
+            scrollToBottom();
         }
         
         function removeLoadingIndicator() {
@@ -1469,14 +1707,7 @@
         }
         
         function showStatus() {
-            fetch('/api/status')
-                .then(r => r.json())
-                .then(data => {
-                    addMessageToChat(data.summary, 'assistant');
-                })
-                .catch(err => {
-                    addMessageToChat('Error loading status', 'error');
-                });
+            sendCommandMessage('Show system status');
         }
         
         function queryPilots() {
