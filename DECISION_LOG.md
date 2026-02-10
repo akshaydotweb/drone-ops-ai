@@ -39,9 +39,9 @@
 ### 1. Flask vs FastAPI vs Django
 | Framework | Chosen? | Reason |
 |-----------|---------|--------|
-| **Flask** | ✅ YES | Lightweight, perfect for prototype-to-production, single file deployable, minimal overhead |
-| FastAPI | ❌ | Overkill for simple API, steeper learning curve, async not needed yet |
-| Django | ❌ | Too heavy, 20+ files boilerplate, better for complex apps with admin panels |
+| **Flask** | YES | Lightweight, perfect for prototype-to-production, single file deployable, minimal overhead |
+| FastAPI | NO | Overkill for simple API, steeper learning curve, async not needed yet |
+| Django | NO | Too heavy, 20+ files boilerplate, better for complex apps with admin panels |
 
 **Trade-off Accepted**: Limited built-in features, manual error handling
 **Benefit**: Flexible, easy to scale to production (can migrate to FastAPI/Django later)
@@ -49,10 +49,10 @@
 ### 2. LLM: ChatGPT + Rule-Based Fallback
 | Approach | Chosen? | Reason |
 |----------|---------|--------|
-| **ChatGPT + Fallback** | ✅ YES | Best of both: intelligent LLM + graceful degradation when API fails |
-| Claude Only | ❌ | More reliable but no fallback, requires API key |
-| Local LLM (Llama) | ❌ | Free & offline but GPU-intensive, slower, overkill for structured queries |
-| Rule-Based Only | ❌ (as primary) | Simple but limited, can't handle context or variations |
+| **ChatGPT + Fallback** | YES | Best of both: intelligent LLM + graceful degradation when API fails |
+| Claude Only | NO | More reliable but no fallback, requires API key |
+| Local LLM (Llama) | NO | Free & offline but GPU-intensive, slower, overkill for structured queries |
+| Rule-Based Only | NO (as primary) | Simple but limited, can't handle context or variations |
 
 **Dual-Mode Architecture**:
 ```
@@ -62,7 +62,7 @@ User Query → [Is OpenAI API available?]
 ```
 
 **Why This Works**:
-- Real scenario: OpenAI API quota exceeded (actual current state) → App still works perfectly
+- Real scenario: OpenAI API quota exceeded (actual current state) -> App still works perfectly
 - LLM mode: Better NLP, conversation context, reasoning
 - Rule-based mode: 80% of operational queries work without AI
 - Trade-off: Rule-based is regex-fragile but sufficient for structured commands
@@ -70,16 +70,16 @@ User Query → [Is OpenAI API available?]
 ### 3. Data Storage: CSV vs SQLite vs PostgreSQL
 | Storage | Chosen? | Reason |
 |---------|---------|--------|
-| **CSV** | ✅ YES | Human-readable, version control friendly, zero setup, lightweight |
-| SQLite | ❌ (for now) | Overkill for 12 records, still needs schema management |
-| PostgreSQL | ❌ (for now) | Needs docker/server, connection pooling, overcomplicated for MVP |
-| Google Sheets | ❌ (Phase 2) | Adds OAuth complexity, but planned for real 2-way sync future |
+| **CSV** | YES | Human-readable, version control friendly, zero setup, lightweight |
+| SQLite | NO (for now) | Overkill for 12 records, still needs schema management |
+| PostgreSQL | NO (for now) | Needs docker/server, connection pooling, overcomplicated for MVP |
+| Google Sheets | NO (Phase 2) | Adds OAuth complexity, but planned for real 2-way sync future |
 
 **CSV Limitations Accepted**:
-- ❌ No concurrent write safety
-- ❌ No indexing (but 5 pilots = linear search fine)
-- ❌ No complex queries
-- ✅ **But**: Simple, git-trackable, editable in Excel
+- No concurrent write safety
+- No indexing (but 5 pilots = linear search fine)
+- No complex queries
+- **But**: Simple, git-trackable, editable in Excel
 
 **Phase Plan**:
 - Phase 1: CSV (current) ✓
@@ -105,16 +105,16 @@ User Query → [Is OpenAI API available?]
 
 ## How "Urgent Reassignments" Were Interpreted
 
-### What We Did NOT Do ❌
-- ❌ Auto-reassign pilots without approval
-- ❌ Override conflict detection for urgent missions
-- ❌ Implement automatic conflict resolution
+### What We Did NOT Do
+- Auto-reassign pilots without approval
+- Override conflict detection for urgent missions
+- Implement automatic conflict resolution
 
-### What We DID Do ✅
-- ✅ Detect urgent missions (priority field)
-- ✅ Flag conflicts immediately when urgent mission is affected
-- ✅ Return actionable suggestions: "Reassign pilot X to mission Y to free up Z"
-- ✅ Require human dispatcher to make final decision
+### What We DID Do
+- Detect urgent missions (priority field)
+- Flag conflicts immediately when urgent mission is affected
+- Return actionable suggestions: "Reassign pilot X to mission Y to free up Z"
+- Require human dispatcher to make final decision
 
 ### Example Flow
 ```
@@ -123,7 +123,7 @@ User: "Assign P001 to urgent mission PRJ999 (2 hour deadline)"
 Agent detects: P001 already assigned to PRJ001 (ends in 1.5 hrs, same location)
 
 Response:
-"⚠️ URGENT MISSION - CONFLICT DETECTED!
+"URGENT MISSION - CONFLICT DETECTED!
 
 Conflict: Double-booking detected
 - Pilot P001 assigned to PRJ001 (ends 14:30)
@@ -159,34 +159,34 @@ Action Required: Dispatcher decision needed"
 ## What We'd Do Differently With More Time
 
 ### Priority 1: Production Hardening (Critical)
-- [ ] Input validation & sanitization (prevent XSS/SQL injection)
-- [ ] Authentication & authorization (JWT tokens, role-based access)
-- [ ] Audit logging (who reassigned what, when, why)
-- [ ] Database migration (PostgreSQL + SQLAlchemy)
-- [ ] Error handling & retry logic (API timeouts, network failures)
-- [ ] Unit tests (70%+ coverage)
-- [ ] Rate limiting (prevent API abuse)
+- Input validation & sanitization (prevent XSS/SQL injection)
+- Authentication & authorization (JWT tokens, role-based access)
+- Audit logging (who reassigned what, when, why)
+- Database migration (PostgreSQL + SQLAlchemy)
+- Error handling & retry logic (API timeouts, network failures)
+- Unit tests (70%+ coverage)
+- Rate limiting (prevent API abuse)
 
 ### Priority 2: Feature Completeness (Important)
-- [ ] Google Sheets 2-way sync (read/write real data)
-- [ ] Real-time updates (WebSockets, not polling)
-- [ ] Better UI (Tailwind CSS, dark mode, mobile responsive)
-- [ ] Bulk operations (reassign multiple pilots at once)
-- [ ] Export reports (CSV, PDF)
-- [ ] Pagination (>50 records)
+- Google Sheets 2-way sync (read/write real data)
+- Real-time updates (WebSockets, not polling)
+- Better UI (Tailwind CSS, dark mode, mobile responsive)
+- Bulk operations (reassign multiple pilots at once)
+- Export reports (CSV, PDF)
+- Pagination (>50 records)
 
 ### Priority 3: Intelligence (Nice-to-Have)
-- [ ] Machine learning (pattern recognition for conflicts)
-- [ ] Predictive scheduling (forecast bottlenecks 7 days out)
-- [ ] Natural language improvements (better LLM prompts)
-- [ ] Multi-language support
-- [ ] Conflict resolution recommendations (what IF analysis)
+- Machine learning (pattern recognition for conflicts)
+- Predictive scheduling (forecast bottlenecks 7 days out)
+- Natural language improvements (better LLM prompts)
+- Multi-language support
+- Conflict resolution recommendations (what IF analysis)
 
 ### Priority 4: Integration (Advanced)
-- [ ] Integration with drone flight APIs (real-time flight tracking)
-- [ ] Weather integration (auto-cancel missions in storms)
-- [ ] Mobile app (React Native)
-- [ ] SMS alerts for urgent missions
+- Integration with drone flight APIs (real-time flight tracking)
+- Weather integration (auto-cancel missions in storms)
+- Mobile app (React Native)
+- SMS alerts for urgent missions
 
 ---
 
@@ -210,7 +210,7 @@ Action Required: Dispatcher decision needed"
 ### Why Rule-Based Fallback > Hard Failure?
 - Alternative: Fail with error if API down
 - Our choice: Gracefully degrade to pattern matching
-- Real-world impact: Demo at 2am when OpenAI quota exceeded? Works anyway ✓
+- Real-world impact: Demo at 2am when OpenAI quota exceeded? Works anyway
 - User experience: No API key requirement for basic queries
 
 ---
@@ -219,13 +219,13 @@ Action Required: Dispatcher decision needed"
 
 | Metric | Target | Achieved |
 |--------|--------|----------|
-| **Development Time** | 4-6 hours | ✅ 4 hours |
-| **Languages Supported** | English | ✅ English |
-| **Concurrent Users** | 1 (prototype) | ✅ 1 user |
-| **Response Time** | <2 seconds | ✅ 100-500ms (rule-based) |
-| **Uptime** | 95% | ✅ 100% (dev) |
-| **Code Quality** | Readable | ✅ Well-documented |
-| **Conflict Types** | 3+ | ✅ 5 types |
+| **Development Time** | 4-6 hours | 4 hours |
+| **Languages Supported** | English | English |
+| **Concurrent Users** | 1 (prototype) | 1 user |
+| **Response Time** | <2 seconds | 100-500ms (rule-based) |
+| **Uptime** | 95% | 100% (dev) |
+| **Code Quality** | Readable | Well-documented |
+| **Conflict Types** | 3+ | 5 types |
 
 ---
 
